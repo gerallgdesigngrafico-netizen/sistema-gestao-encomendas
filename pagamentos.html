@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamentos - Sistema de Gestão</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="text-gray-600 hover:text-gray-900">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <h1 class="text-2xl font-bold text-gray-900">
+                        <i class="fas fa-euro-sign text-green-600 mr-2"></i>
+                        Gestão de Pagamentos
+                    </h1>
+                </div>
+                <button onclick="logout()" class="text-red-600 hover:text-red-700">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Stats Cards -->
+        <div class="grid md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Total Recebido</p>
+                        <p id="totalRecebido" class="text-2xl font-bold text-green-600">€0.00</p>
+                    </div>
+                    <i class="fas fa-check-circle text-3xl text-green-600"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Pendente</p>
+                        <p id="totalPendente" class="text-2xl font-bold text-yellow-600">€0.00</p>
+                    </div>
+                    <i class="fas fa-clock text-3xl text-yellow-600"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Parcial</p>
+                        <p id="totalParcial" class="text-2xl font-bold text-blue-600">€0.00</p>
+                    </div>
+                    <i class="fas fa-spinner text-3xl text-blue-600"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Total Geral</p>
+                        <p id="totalGeral" class="text-2xl font-bold text-gray-900">€0.00</p>
+                    </div>
+                    <i class="fas fa-money-bill-wave text-3xl text-gray-600"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions Bar -->
+        <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div class="flex-1 max-w-md">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        id="searchInput"
+                        placeholder="Pesquisar pagamentos..."
+                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        oninput="filterPagamentos()"
+                    >
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <select id="filterEstado" onchange="filterPagamentos()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <option value="">Todos os Estados</option>
+                    <option value="Pago">Pago</option>
+                    <option value="Pendente">Pendente</option>
+                    <option value="Parcial">Parcial</option>
+                </select>
+                <button onclick="openModal()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg flex items-center gap-2">
+                    <i class="fas fa-plus"></i>
+                    Novo Pagamento
+                </button>
+            </div>
+        </div>
+
+        <!-- Pagamentos List -->
+        <div id="pagamentosList" class="space-y-4">
+            <!-- Pagamentos serão renderizados aqui -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-16">
+            <i class="fas fa-money-bill-wave text-gray-400 text-6xl mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">Nenhum pagamento encontrado</h3>
+            <p class="text-gray-600 mb-6">Comece registrando o seu primeiro pagamento</p>
+            <button onclick="openModal()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg">
+                <i class="fas fa-plus mr-2"></i>Novo Pagamento
+            </button>
+        </div>
+    </main>
+
+    <!-- Modal Novo/Editar Pagamento -->
+    <div id="pagamentoModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">
+                        <i class="fas fa-euro-sign text-green-600 mr-2"></i>
+                        <span id="modalTitle">Novo Pagamento</span>
+                    </h2>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <form id="pagamentoForm" onsubmit="savePagamento(event)">
+                    <div class="space-y-4">
+                        <!-- Encomenda -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Encomenda *
+                            </label>
+                            <select id="encomenda_id" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" onchange="updateEncomendaInfo()">
+                                <option value="">Selecione uma encomenda</option>
+                            </select>
+                            <div id="encomendaInfo" class="hidden mt-2 p-3 bg-blue-50 rounded-lg text-sm">
+                                <p class="text-gray-700"><strong>Total:</strong> <span id="infoTotal">€0.00</span></p>
+                                <p class="text-gray-700"><strong>Já Pago:</strong> <span id="infoJaPago">€0.00</span></p>
+                                <p class="text-gray-700"><strong>Restante:</strong> <span id="infoRestante">€0.00</span></p>
+                            </div>
+                        </div>
+
+                        <!-- Valor e Método -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Valor (€) *
+                                </label>
+                                <input 
+                                    type="number" 
+                                    id="valor"
+                                    step="0.01"
+                                    min="0.01"
+                                    required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                >
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Método de Pagamento *
+                                </label>
+                                <select id="metodo" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    <option value="Dinheiro">Dinheiro</option>
+                                    <option value="Transferência">Transferência</option>
+                                    <option value="MB WAY">MB WAY</option>
+                                    <option value="Multibanco">Multibanco</option>
+                                    <option value="Cheque">Cheque</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Data e Referência -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Data do Pagamento *
+                                </label>
+                                <input 
+                                    type="date" 
+                                    id="data_pagamento"
+                                    required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                >
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Referência
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="referencia"
+                                    placeholder="Nº Transferência, etc."
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Observações -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Observações
+                            </label>
+                            <textarea 
+                                id="observacoes"
+                                rows="3"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                placeholder="Observações adicionais..."
+                            ></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="flex gap-3 mt-6">
+                        <button type="submit" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold">
+                            <i class="fas fa-save mr-2"></i>Guardar
+                        </button>
+                        <button type="button" onclick="closeModal()" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Verificar autenticação
+        const session = localStorage.getItem('encomendas_session') || sessionStorage.getItem('encomendas_session');
+        if (!session) {
+            window.location.href = 'login.html';
+        }
+
+        let allPagamentos = [];
+        let editingPagamento = null;
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('encomendas_session');
+            sessionStorage.removeItem('encomendas_session');
+            window.location.href = 'login.html';
+        }
+
+        // Carregar dados iniciais
+        window.addEventListener('DOMContentLoaded', () => {
+            // Definir data atual
+            document.getElementById('data_pagamento').valueAsDate = new Date();
+            loadEncomendas();
+            loadPagamentos();
+        });
+
+        // Carregar encomendas
+        function loadEncomendas() {
+            const encomendas = JSON.parse(localStorage.getItem('encomendas') || '[]');
+            const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
+            const produtos = JSON.parse(localStorage.getItem('produtos') || '[]');
+            
+            const select = document.getElementById('encomenda_id');
+            select.innerHTML = '<option value="">Selecione uma encomenda</option>';
+            
+            encomendas.forEach(encomenda => {
+                const cliente = clientes.find(c => c.id == encomenda.cliente_id);
+                const produto = produtos.find(p => p.id == encomenda.produto_id);
+                const total = encomenda.quantidade * encomenda.valor_unitario;
+                
+                const option = document.createElement('option');
+                option.value = encomenda.id;
+                option.textContent = `${cliente ? cliente.nome : 'N/A'} - ${produto ? produto.nome : 'N/A'} (€${total.toFixed(2)})`;
+                option.setAttribute('data-total', total);
+                select.appendChild(option);
+            });
+        }
+
+        // Atualizar info da encomenda
+        function updateEncomendaInfo() {
+            const select = document.getElementById('encomenda_id');
+            const selected = select.options[select.selectedIndex];
+            const infoDiv = document.getElementById('encomendaInfo');
+            
+            if (selected.value) {
+                const total = parseFloat(selected.getAttribute('data-total'));
+                const jaPago = calcularJaPago(selected.value);
+                const restante = total - jaPago;
+                
+                document.getElementById('infoTotal').textContent = `€${total.toFixed(2)}`;
+                document.getElementById('infoJaPago').textContent = `€${jaPago.toFixed(2)}`;
+                document.getElementById('infoRestante').textContent = `€${restante.toFixed(2)}`;
+                document.getElementById('valor').value = restante > 0 ? restante.toFixed(2) : '';
+                
+                infoDiv.classList.remove('hidden');
+            } else {
+                infoDiv.classList.add('hidden');
+            }
+        }
+
+        // Calcular quanto já foi pago
+        function calcularJaPago(encomendaId) {
+            const pagamentos = JSON.parse(localStorage.getItem('pagamentos') || '[]');
+            return pagamentos
+                .filter(p => p.encomenda_id == encomendaId)
+                .reduce((sum, p) => sum + parseFloat(p.valor), 0);
+        }
+
+        // Carregar pagamentos
+        function loadPagamentos() {
+            allPagamentos = JSON.parse(localStorage.getItem('pagamentos') || '[]');
+            updateStats();
+            renderPagamentos();
+        }
+
+        // Atualizar estatísticas
+        function updateStats() {
+            const encomendas = JSON.parse(localStorage.getItem('encomendas') || '[]');
+            
+            let totalRecebido = 0;
+            let totalPendente = 0;
+            let totalParcial = 0;
+            let totalGeral = 0;
+
+            encomendas.forEach(encomenda => {
+                const total = encomenda.quantidade * encomenda.valor_unitario;
+                const jaPago = calcularJaPago(encomenda.id);
+                const restante = total - jaPago;
+                
+                totalGeral += total;
+                
+                if (jaPago >= total) {
+                    totalRecebido += total;
+                } else if (jaPago > 0) {
+                    totalParcial += total;
+                    totalRecebido += jaPago;
+                } else {
+                    totalPendente += total;
+                }
+            });
+
+            document.getElementById('totalRecebido').textContent = `€${totalRecebido.toFixed(2)}`;
+            document.getElementById('totalPendente').textContent = `€${totalPendente.toFixed(2)}`;
+            document.getElementById('totalParcial').textContent = `€${(totalGeral - totalRecebido - totalPendente).toFixed(2)}`;
+            document.getElementById('totalGeral').textContent = `€${totalGeral.toFixed(2)}`;
+        }
+
+        // Renderizar pagamentos
+        function renderPagamentos() {
+            const list = document.getElementById('pagamentosList');
+            const emptyState = document.getElementById('emptyState');
+            
+            const filtered = filterPagamentosList();
+
+            if (filtered.length === 0) {
+                list.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            const encomendas = JSON.parse(localStorage.getItem('encomendas') || '[]');
+            const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
+
+            list.innerHTML = filtered.map(pagamento => {
+                const encomenda = encomendas.find(e => e.id == pagamento.encomenda_id);
+                const cliente = encomenda ? clientes.find(c => c.id == encomenda.cliente_id) : null;
+                
+                const metodosIcons = {
+                    'Dinheiro': 'fa-money-bill-wave',
+                    'Transferência': 'fa-exchange-alt',
+                    'MB WAY': 'fa-mobile-alt',
+                    'Multibanco': 'fa-credit-card',
+                    'Cheque': 'fa-file-invoice-dollar'
+                };
+
+                return `
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <i class="fas ${metodosIcons[pagamento.metodo] || 'fa-coins'} text-2xl text-green-600"></i>
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-gray-900">
+                                            ${cliente ? cliente.nome : 'Cliente não encontrado'}
+                                        </h3>
+                                        <p class="text-sm text-gray-600">${pagamento.metodo}</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-3 gap-4 mt-4 text-sm">
+                                    <div>
+                                        <p class="text-gray-500">Valor</p>
+                                        <p class="font-semibold text-green-600 text-lg">€${parseFloat(pagamento.valor).toFixed(2)}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-gray-500">Data</p>
+                                        <p class="font-semibold">${new Date(pagamento.data_pagamento).toLocaleDateString('pt-PT')}</p>
+                                    </div>
+                                    ${pagamento.referencia ? `
+                                        <div>
+                                            <p class="text-gray-500">Referência</p>
+                                            <p class="font-semibold">${pagamento.referencia}</p>
+                                        </div>
+                                    ` : '<div></div>'}
+                                </div>
+
+                                ${pagamento.observacoes ? `
+                                    <div class="mt-4 text-sm">
+                                        <p class="text-gray-500">Observações</p>
+                                        <p class="text-gray-700">${pagamento.observacoes}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            
+                            <div class="flex gap-2 ml-4">
+                                <button onclick="editPagamento(${pagamento.id})" class="p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="deletePagamento(${pagamento.id})" class="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Filtrar pagamentos
+        function filterPagamentosList() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const estadoFilter = document.getElementById('filterEstado').value;
+            
+            return allPagamentos.filter(pagamento => {
+                const encomendas = JSON.parse(localStorage.getItem('encomendas') || '[]');
+                const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
+                
+                const encomenda = encomendas.find(e => e.id == pagamento.encomenda_id);
+                const cliente = encomenda ? clientes.find(c => c.id == encomenda.cliente_id) : null;
+                
+                const matchSearch = !searchTerm || 
+                    (cliente && cliente.nome.toLowerCase().includes(searchTerm)) ||
+                    pagamento.metodo.toLowerCase().includes(searchTerm);
+                
+                // Para filtro de estado, calcular estado do pagamento
+                let matchEstado = true;
+                if (estadoFilter && encomenda) {
+                    const total = encomenda.quantidade * encomenda.valor_unitario;
+                    const jaPago = calcularJaPago(encomenda.id);
+                    
+                    if (estadoFilter === 'Pago' && jaPago < total) matchEstado = false;
+                    if (estadoFilter === 'Pendente' && jaPago > 0) matchEstado = false;
+                    if (estadoFilter === 'Parcial' && (jaPago === 0 || jaPago >= total)) matchEstado = false;
+                }
+
+                return matchSearch && matchEstado;
+            });
+        }
+
+        function filterPagamentos() {
+            renderPagamentos();
+        }
+
+        // Abrir modal
+        function openModal() {
+            editingPagamento = null;
+            document.getElementById('modalTitle').textContent = 'Novo Pagamento';
+            document.getElementById('pagamentoForm').reset();
+            document.getElementById('data_pagamento').valueAsDate = new Date();
+            document.getElementById('encomendaInfo').classList.add('hidden');
+            document.getElementById('pagamentoModal').classList.remove('hidden');
+        }
+
+        // Fechar modal
+        function closeModal() {
+            document.getElementById('pagamentoModal').classList.add('hidden');
+        }
+
+        // Editar pagamento
+        function editPagamento(id) {
+            editingPagamento = allPagamentos.find(p => p.id === id);
+            if (!editingPagamento) return;
+
+            document.getElementById('modalTitle').textContent = 'Editar Pagamento';
+            document.getElementById('encomenda_id').value = editingPagamento.encomenda_id;
+            document.getElementById('valor').value = editingPagamento.valor;
+            document.getElementById('metodo').value = editingPagamento.metodo;
+            document.getElementById('data_pagamento').value = editingPagamento.data_pagamento;
+            document.getElementById('referencia').value = editingPagamento.referencia || '';
+            document.getElementById('observacoes').value = editingPagamento.observacoes || '';
+            
+            updateEncomendaInfo();
+            document.getElementById('pagamentoModal').classList.remove('hidden');
+        }
+
+        // Guardar pagamento
+        function savePagamento(e) {
+            e.preventDefault();
+
+            const pagamentoData = {
+                id: editingPagamento ? editingPagamento.id : Date.now(),
+                encomenda_id: document.getElementById('encomenda_id').value,
+                valor: parseFloat(document.getElementById('valor').value),
+                metodo: document.getElementById('metodo').value,
+                data_pagamento: document.getElementById('data_pagamento').value,
+                referencia: document.getElementById('referencia').value,
+                observacoes: document.getElementById('observacoes').value,
+                created_at: editingPagamento ? editingPagamento.created_at : new Date().toISOString()
+            };
+
+            if (editingPagamento) {
+                const index = allPagamentos.findIndex(p => p.id === editingPagamento.id);
+                allPagamentos[index] = pagamentoData;
+            } else {
+                allPagamentos.push(pagamentoData);
+            }
+
+            localStorage.setItem('pagamentos', JSON.stringify(allPagamentos));
+            closeModal();
+            loadPagamentos();
+            
+            alert('✅ Pagamento guardado com sucesso!');
+        }
+
+        // Eliminar pagamento
+        function deletePagamento(id) {
+            if (!confirm('Tem certeza que deseja eliminar este pagamento?')) return;
+
+            allPagamentos = allPagamentos.filter(p => p.id !== id);
+            localStorage.setItem('pagamentos', JSON.stringify(allPagamentos));
+            loadPagamentos();
+            
+            alert('✅ Pagamento eliminado com sucesso!');
+        }
+    </script>
+</body>
+</html>
