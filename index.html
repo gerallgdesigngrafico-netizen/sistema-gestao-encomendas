@@ -35,7 +35,7 @@
                 🎉 Bem-vindo ao Sistema!
             </h2>
             <p class="text-gray-600 text-lg mb-4">
-                Seu sistema está <strong class="text-green-600">ONLINE</strong> e funcionando!
+                Seu sistema está <strong class="text-green-600">ONLINE</strong> e funcionando perfeitamente!
             </p>
             <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded">
                 <p class="text-green-700">
@@ -55,9 +55,9 @@
                     <span class="text-3xl font-bold text-gray-800" id="statClientes">0</span>
                 </div>
                 <h3 class="text-gray-600 font-semibold">Clientes</h3>
-                <button onclick="alert('Criar funcionalidade: Adicionar cliente')" class="mt-4 text-sm text-blue-600 hover:text-blue-800">
+                <a href="clientes.html" class="mt-4 inline-block text-sm text-blue-600 hover:text-blue-800">
                     <i class="fas fa-plus mr-1"></i>Adicionar
-                </button>
+                </a>
             </div>
 
             <div class="bg-white rounded-lg shadow p-6">
@@ -68,9 +68,9 @@
                     <span class="text-3xl font-bold text-gray-800" id="statProdutos">0</span>
                 </div>
                 <h3 class="text-gray-600 font-semibold">Produtos</h3>
-                <button onclick="alert('Criar funcionalidade: Adicionar produto')" class="mt-4 text-sm text-green-600 hover:text-green-800">
+                <a href="produtos.html" class="mt-4 inline-block text-sm text-green-600 hover:text-green-800">
                     <i class="fas fa-plus mr-1"></i>Adicionar
-                </button>
+                </a>
             </div>
 
             <div class="bg-white rounded-lg shadow p-6">
@@ -81,9 +81,9 @@
                     <span class="text-3xl font-bold text-gray-800" id="statOrcamentos">0</span>
                 </div>
                 <h3 class="text-gray-600 font-semibold">Orçamentos</h3>
-                <button onclick="alert('Criar funcionalidade: Novo orçamento')" class="mt-4 text-sm text-purple-600 hover:text-purple-800">
+                <a href="orcamentos.html" class="mt-4 inline-block text-sm text-purple-600 hover:text-purple-800">
                     <i class="fas fa-plus mr-1"></i>Criar
-                </button>
+                </a>
             </div>
 
             <div class="bg-white rounded-lg shadow p-6">
@@ -94,7 +94,7 @@
                     <span class="text-3xl font-bold text-gray-800" id="statEncomendas">0</span>
                 </div>
                 <h3 class="text-gray-600 font-semibold">Encomendas</h3>
-                <button onclick="alert('Criar funcionalidade: Nova encomenda')" class="mt-4 text-sm text-yellow-600 hover:text-yellow-800">
+                <button onclick="alert('Em desenvolvimento')" class="mt-4 text-sm text-yellow-600 hover:text-yellow-800">
                     <i class="fas fa-plus mr-1"></i>Criar
                 </button>
             </div>
@@ -106,38 +106,39 @@
                 <i class="fas fa-th-large text-indigo-600 mr-2"></i>Menu Principal
             </h2>
             <div class="grid md:grid-cols-3 gap-4">
-                <button onclick="alert('Página em desenvolvimento')" class="bg-blue-500 text-white p-6 rounded-lg hover:bg-blue-600 text-left">
-                    <i class="fas fa-users text-3xl mb-3"></i>
+                
+                <a href="clientes.html" class="bg-blue-500 text-white p-6 rounded-lg hover:bg-blue-600 text-left block transition">
+                    <i class="fas fa-users text-3xl mb-3 block"></i>
                     <p class="font-bold text-lg">Clientes</p>
                     <p class="text-sm opacity-90">Gerir clientes B2B/B2C</p>
-                </button>
+                </a>
 
-                <button onclick="alert('Página em desenvolvimento')" class="bg-green-500 text-white p-6 rounded-lg hover:bg-green-600 text-left">
-                    <i class="fas fa-box text-3xl mb-3"></i>
+                <a href="produtos.html" class="bg-green-500 text-white p-6 rounded-lg hover:bg-green-600 text-left block transition">
+                    <i class="fas fa-box text-3xl mb-3 block"></i>
                     <p class="font-bold text-lg">Produtos</p>
                     <p class="text-sm opacity-90">Catálogo e stock</p>
-                </button>
+                </a>
 
-                <button onclick="alert('Página em desenvolvimento')" class="bg-purple-500 text-white p-6 rounded-lg hover:bg-purple-600 text-left">
-                    <i class="fas fa-file-invoice text-3xl mb-3"></i>
+                <a href="orcamentos.html" class="bg-purple-500 text-white p-6 rounded-lg hover:bg-purple-600 text-left block transition">
+                    <i class="fas fa-file-invoice text-3xl mb-3 block"></i>
                     <p class="font-bold text-lg">Orçamentos</p>
                     <p class="text-sm opacity-90">Criar e gerir orçamentos</p>
-                </button>
+                </a>
 
-                <button onclick="alert('Página em desenvolvimento')" class="bg-yellow-500 text-white p-6 rounded-lg hover:bg-yellow-600 text-left">
-                    <i class="fas fa-shopping-cart text-3xl mb-3"></i>
+                <button onclick="alert('Página em desenvolvimento')" class="bg-yellow-500 text-white p-6 rounded-lg hover:bg-yellow-600 text-left transition">
+                    <i class="fas fa-shopping-cart text-3xl mb-3 block"></i>
                     <p class="font-bold text-lg">Encomendas</p>
                     <p class="text-sm opacity-90">Processar encomendas</p>
                 </button>
 
-                <button onclick="alert('Página em desenvolvimento')" class="bg-red-500 text-white p-6 rounded-lg hover:bg-red-600 text-left">
-                    <i class="fas fa-euro-sign text-3xl mb-3"></i>
+                <button onclick="alert('Página em desenvolvimento')" class="bg-red-500 text-white p-6 rounded-lg hover:bg-red-600 text-left transition">
+                    <i class="fas fa-euro-sign text-3xl mb-3 block"></i>
                     <p class="font-bold text-lg">Pagamentos</p>
                     <p class="text-sm opacity-90">Controlar pagamentos</p>
                 </button>
 
-                <button onclick="alert('Página em desenvolvimento')" class="bg-indigo-500 text-white p-6 rounded-lg hover:bg-indigo-600 text-left">
-                    <i class="fas fa-chart-line text-3xl mb-3"></i>
+                <button onclick="alert('Página em desenvolvimento')" class="bg-indigo-500 text-white p-6 rounded-lg hover:bg-indigo-600 text-left transition">
+                    <i class="fas fa-chart-line text-3xl mb-3 block"></i>
                     <p class="font-bold text-lg">Relatórios</p>
                     <p class="text-sm opacity-90">Análises financeiras</p>
                 </button>
