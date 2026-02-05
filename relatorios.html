@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios - Sistema de Gestão</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="text-gray-600 hover:text-gray-900">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <h1 class="text-2xl font-bold text-gray-900">
+                        <i class="fas fa-chart-bar text-purple-600 mr-2"></i>
+                        Relatórios Financeiros
+                    </h1>
+                </div>
+                <button onclick="logout()" class="text-red-600 hover:text-red-700">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Período de Análise -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">
+                <i class="fas fa-calendar text-purple-600 mr-2"></i>
+                Período de Análise
+            </h2>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Data Início</label>
+                    <input type="date" id="dataInicio" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" onchange="atualizarRelatorios()">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Data Fim</label>
+                    <input type="date" id="dataFim" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" onchange="atualizarRelatorios()">
+                </div>
+                <div class="flex items-end">
+                    <button onclick="definirPeriodo('mes')" class="flex-1 mr-2 px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg">Este Mês</button>
+                    <button onclick="definirPeriodo('ano')" class="flex-1 px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg">Este Ano</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPIs Principais -->
+        <div class="grid md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between mb-2">
+                    <i class="fas fa-euro-sign text-3xl opacity-80"></i>
+                    <span class="text-xs bg-white/20 px-2 py-1 rounded">Receita</span>
+                </div>
+                <p class="text-3xl font-bold" id="receitaTotal">€0.00</p>
+                <p class="text-sm opacity-80">Total de Vendas</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between mb-2">
+                    <i class="fas fa-check-circle text-3xl opacity-80"></i>
+                    <span class="text-xs bg-white/20 px-2 py-1 rounded">Recebido</span>
+                </div>
+                <p class="text-3xl font-bold" id="recebidoTotal">€0.00</p>
+                <p class="text-sm opacity-80">Pagamentos Confirmados</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between mb-2">
+                    <i class="fas fa-clock text-3xl opacity-80"></i>
+                    <span class="text-xs bg-white/20 px-2 py-1 rounded">Pendente</span>
+                </div>
+                <p class="text-3xl font-bold" id="pendenteTotal">€0.00</p>
+                <p class="text-sm opacity-80">A Receber</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between mb-2">
+                    <i class="fas fa-chart-line text-3xl opacity-80"></i>
+                    <span class="text-xs bg-white/20 px-2 py-1 rounded">Lucro</span>
+                </div>
+                <p class="text-3xl font-bold" id="lucroTotal">€0.00</p>
+                <p class="text-sm opacity-80">Receita - Despesas</p>
+            </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+            <!-- Vendas Mensais -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                    <i class="fas fa-chart-line text-blue-600 mr-2"></i>
+                    Vendas Mensais
+                </h3>
+                <div style="height: 300px;">
+                    <canvas id="vendasChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Métodos de Pagamento -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                    <i class="fas fa-money-bill-wave text-green-600 mr-2"></i>
+                    Métodos de Pagamento
+                </h3>
+                <div style="height: 300px;">
+                    <canvas id="metodosChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Clientes -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                <i class="fas fa-trophy text-yellow-600 mr-2"></i>
+                Top 10 Clientes
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Encomendas</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="topClientesBody" class="divide-y divide-gray-200">
+                        <!-- Será preenchido dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Top Produtos -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                <i class="fas fa-star text-yellow-600 mr-2"></i>
+                Top 10 Produtos Mais Vendidos
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Produto</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Categoria</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Quantidade</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="topProdutosBody" class="divide-y divide-gray-200">
+                        <!-- Será preenchido dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Verificar autenticação
+        const session = localStorage.getItem('encomendas_session') || sessionStorage.getItem('encomendas_session');
+        if (!session) {
+            window.location.href = 'login.html';
+        }
+
+        let vendasChart, metodosChart;
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('encomendas_session');
+            sessionStorage.removeItem('encomendas_session');
+            window.location.href = 'login.html';
+        }
+
+        // Carregar dados iniciais
+        window.addEventListener('DOMContentLoaded', () => {
+            definirPeriodo('mes');
+            initCharts();
+        });
+
+        // Definir período
+        function definirPeriodo(tipo) {
+            const hoje = new Date();
+            const dataFim = document.getElementById('dataFim');
+            dataFim.valueAsDate = hoje;
+
+            const dataInicio = document.getElementById('dataInicio');
+            if (tipo === 'mes') {
+                const primeiroDia = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+                dataInicio.valueAsDate = primeiroDia;
+            } else if (tipo === 'ano') {
+                const primeiroAno = new Date(hoje.getFullYear(), 0, 1);
+                dataInicio.valueAsDate = primeiroAno;
+            }
+
+            atualizarRelatorios();
+        }
+
+        // Atualizar relatórios
+        function atualizarRelatorios() {
+            const dataInicio = new Date(document.getElementById('dataInicio').value);
+            const dataFim = new Date(document.getElementById('dataFim').value);
+            dataFim.setHours(23, 59, 59);
+
+            calcularKPIs(dataInicio, dataFim);
+            atualizarGraficos(dataInicio, dataFim);
+            atualizarTopClientes(dataInicio, dataFim);
+            atualizarTopProdutos(dataInicio, dataFim);
+        }
+
+        // Calcular KPIs
+        function calcularKPIs(dataInicio, dataFim) {
+            const encomendas = JSON.parse(localStorage.getItem('encomendas') || '[]');
+            const pagamentos = JSON.parse(localStorage.getItem('pagamentos') || '[]');
+            const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
+
+            // Filtrar por período
+            const encomendasPeriodo = encomendas.filter(e => {
+                const data = new Date(e.created_at);
+                return data >= dataInicio && data <= dataFim;
+            });
+
+            const pagamentosPeriodo = pagamentos.filter(p => {
+                const data = new Date(p.data_pagamento);
+                return data >= dataInicio && data <= dataFim;
+            });
+
+            const despesasPeriodo = despesas.filter(d => {
+                const data = new Date(d.data_despesa);
+                return data >= dataInicio && data <= dataFim;
+            });
+
+            // Calcular totais
+            const receita = encomendasPeriodo.reduce((sum, e) => sum + (e.quantidade * e.valor_unitario), 0);
+            const recebido = pagamentosPeriodo.reduce((sum, p) => sum + parseFloat(p.valor), 0);
+            const despesasTotal = despesasPeriodo.reduce((sum, d) => sum + parseFloat(d.valor), 0);
+            const lucro = recebido - despesasTotal;
+
+            document.getElementById('receitaTotal').textContent = `€${receita.toFixed(2)}`;
+            document.getElementById('recebidoTotal').textContent = `€${recebido.toFixed(2)}`;
+            document.getElementById('pendenteTotal').textContent = `€${(receita - recebido).toFixed(2)}`;
+            document.getElementById('lucroTotal').textContent = `€${lucro.toFixed(2)}`;
+        }
+
+        // Inicializar gráficos
+        function initCharts() {
+            // Gráfico de Vendas
+            const ctxVendas = document.getElementById('vendasChart').getContext('2d');
+            vendasChart = new Chart(ctxVendas, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Vendas',
+                        data: [],
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => '€' + value
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de Métodos
+            const ctxMetodos = document.getElementById('metodosChart').getContext('2d');
+            metodosChart = new Chart(ctxMetodos, {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [
+                            'rgb(34, 197, 94)',
+                            'rgb(59, 130, 246)',
+                            'rgb(168, 85, 247)',
+                            'rgb(234, 179, 8)',
+                            'rgb(239, 68, 68)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Atualizar gráficos
+        function atualizarGraficos(dataInicio, dataFim) {
+            const encomendas = JSON.parse(localStorage.getItem('encomendas') || '[]');
+            const pagamentos = JSON.parse(localStorage.getItem('pagamentos') || '[]');
+
+            // Vendas mensais
+            const vendasPorMes = {};
+            encomendas.forEach(e => {
+                const data = new Date(e.created_at);
+                if (data >= dataInicio && data <= dataFim) {
+                    const mesAno = data.toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' });
+                    vendasPorMes[mesAno] = (vendasPorMes[mesAno] || 0) + (e.quantidade * e.valor_unitario);
+                }
+            });
+
+            vendasChart.data.labels = Object.keys(vendasPorMes);
+            vendasChart.data.datasets[0].data = Object.values(vendasPorMes);
+            vendasChart.update();
+
+            // Métodos de pagamento
+            const metodosPorTipo = {};
+            pagamentos.forEach(p => {
+                const data = new Date(p.data_pagamento);
+                if (data >= dataInicio && data <= dataFim) {
+                    metodosPorTipo[p.metodo] = (metodosPorTipo[p.metodo] || 0) + parseFloat(p.valor);
+                }
+            });
+
+            metodosChart.data.labels = Object.keys(metodosPorTipo);
+            metodosChart.data.datasets[0].data = Object.values(metodosPorTipo);
+            metodosChart.update();
+        }
+
+        // Atualizar top clientes
+        function atualizarTopClientes(dataInicio, dataFim) {
+            const encomendas = JSON.parse(localStorage.getItem('encomendas') || '[]');
+            const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
+
+            const clientesStats = {};
+
+            encomendas.forEach(e => {
+                const data = new Date(e.created_at);
+                if (data >= dataInicio && data <= dataFim) {
+                    if (!clientesStats[e.cliente_id]) {
+                        clientesStats[e.cliente_id] = { total: 0, count: 0 };
+                    }
+                    clientesStats[e.cliente_id].total += (e.quantidade * e.valor_unitario);
+                    clientesStats[e.cliente_id].count++;
+                }
+            });
+
+            const sorted = Object.entries(clientesStats)
+                .map(([id, stats]) => {
+                    const cliente = clientes.find(c => c.id == id);
+                    return { cliente, ...stats };
+                })
+                .sort((a, b) => b.total - a.total)
+                .slice(0, 10);
+
+            const tbody = document.getElementById('topClientesBody');
+            tbody.innerHTML = sorted.map((item, index) => `
+                <tr>
+                    <td class="px-4 py-3 text-sm text-gray-900">${index + 1}</td>
+                    <td class="px-4 py-3 text-sm font-medium text-gray-900">${item.cliente ? item.cliente.nome : 'N/A'}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600">${item.cliente ? item.cliente.tipo : 'N/A'}</td>
+                    <td class="px-4 py-3 text-sm text-right text-gray-900">${item.count}</td>
+                    <td class="px-4 py-3 text-sm text-right font-semibold text-green-600">€${item.total.toFixed(2)}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Atualizar top produtos
+        function atualizarTopProdutos(dataInicio, dataFim) {
+            const encomendas = JSON.parse(localStorage.getItem('encomendas') || '[]');
+            const produtos = JSON.parse(localStorage.getItem('produtos') || '[]');
+
+            const produtosStats = {};
+
+            encomendas.forEach(e => {
+                const data = new Date(e.created_at);
+                if (data >= dataInicio && data <= dataFim) {
+                    if (!produtosStats[e.produto_id]) {
+                        produtosStats[e.produto_id] = { quantidade: 0, total: 0 };
+                    }
+                    produtosStats[e.produto_id].quantidade += e.quantidade;
+                    produtosStats[e.produto_id].total += (e.quantidade * e.valor_unitario);
+                }
+            });
+
+            const sorted = Object.entries(produtosStats)
+                .map(([id, stats]) => {
+                    const produto = produtos.find(p => p.id == id);
+                    return { produto, ...stats };
+                })
+                .sort((a, b) => b.quantidade - a.quantidade)
+                .slice(0, 10);
+
+            const tbody = document.getElementById('topProdutosBody');
+            tbody.innerHTML = sorted.map((item, index) => `
+                <tr>
+                    <td class="px-4 py-3 text-sm text-gray-900">${index + 1}</td>
+                    <td class="px-4 py-3 text-sm font-medium text-gray-900">${item.produto ? item.produto.nome : 'N/A'}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600">${item.produto ? item.produto.categoria : 'N/A'}</td>
+                    <td class="px-4 py-3 text-sm text-right text-gray-900">${item.quantidade}</td>
+                    <td class="px-4 py-3 text-sm text-right font-semibold text-green-600">€${item.total.toFixed(2)}</td>
+                </tr>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
