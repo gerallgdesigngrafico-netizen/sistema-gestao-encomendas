@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,324 +7,397 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-100">
-
-<div class="min-h-screen">
+<body class="bg-gray-50">
     <!-- Header -->
-    <header class="bg-indigo-600 text-white shadow-lg">
-        <div class="container mx-auto px-4 py-4 flex items-center justify-between">
-            <h1 class="text-2xl font-bold">
-                <i class="fas fa-box mr-2"></i>Gestão de Produtos
-            </h1>
-            <div class="flex items-center space-x-4">
-                <a href="index.html" class="text-sm hover:text-indigo-200">
-                    <i class="fas fa-home mr-1"></i>Dashboard
-                </a>
-                <span id="userName" class="text-sm"></span>
-                <button onclick="handleLogout()" class="bg-indigo-700 px-4 py-2 rounded-lg hover:bg-indigo-800">
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="text-gray-600 hover:text-gray-900">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <h1 class="text-2xl font-bold text-gray-900">
+                        <i class="fas fa-box text-purple-600 mr-2"></i>
+                        Gestão de Produtos
+                    </h1>
+                </div>
+                <button onclick="logout()" class="text-red-600 hover:text-red-700">
                     <i class="fas fa-sign-out-alt mr-2"></i>Sair
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Main -->
-    <main class="container mx-auto px-4 py-8">
-        
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Actions Bar -->
-        <div class="bg-white rounded-lg shadow p-4 mb-6 flex justify-between items-center">
-            <div class="flex gap-2">
-                <input type="text" id="searchInput" placeholder="Pesquisar produtos..." 
-                    class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500">
-                <select id="filterCategoria" class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500">
-                    <option value="">Todas categorias</option>
+        <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div class="flex-1 max-w-md">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        id="searchInput"
+                        placeholder="Pesquisar produtos..."
+                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        oninput="filterProdutos()"
+                    >
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <select id="filterCategoria" onchange="filterProdutos()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                    <option value="">Todas as Categorias</option>
                     <option value="Têxtil">Têxtil</option>
                     <option value="Brindes">Brindes</option>
                     <option value="Papelaria">Papelaria</option>
                     <option value="Outros">Outros</option>
                 </select>
+                <button onclick="openModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg flex items-center gap-2">
+                    <i class="fas fa-plus"></i>
+                    Novo Produto
+                </button>
             </div>
-            <button onclick="openModal()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700">
-                <i class="fas fa-plus mr-2"></i>Novo Produto
-            </button>
         </div>
 
         <!-- Produtos Grid -->
-        <div id="produtosGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div id="produtosList" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Produtos serão renderizados aqui -->
         </div>
 
         <!-- Empty State -->
-        <div id="emptyState" class="hidden bg-white rounded-lg shadow p-12 text-center">
-            <i class="fas fa-box-open text-gray-300 text-6xl mb-4"></i>
-            <h3 class="text-xl font-bold text-gray-700 mb-2">Nenhum produto cadastrado</h3>
-            <p class="text-gray-500 mb-6">Comece adicionando seu primeiro produto!</p>
-            <button onclick="openModal()" class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700">
-                <i class="fas fa-plus mr-2"></i>Adicionar Primeiro Produto
+        <div id="emptyState" class="hidden text-center py-16">
+            <i class="fas fa-box-open text-gray-400 text-6xl mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">Nenhum produto encontrado</h3>
+            <p class="text-gray-600 mb-6">Comece criando o seu primeiro produto</p>
+            <button onclick="openModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg">
+                <i class="fas fa-plus mr-2"></i>Novo Produto
             </button>
         </div>
-
     </main>
-</div>
 
-<!-- Modal -->
-<div id="produtoModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div class="p-6 border-b flex justify-between items-center">
-            <h2 class="text-2xl font-bold text-gray-800">
-                <i class="fas fa-box text-indigo-600 mr-2"></i>
-                <span id="modalTitle">Novo Produto</span>
-            </h2>
-            <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700">
-                <i class="fas fa-times text-2xl"></i>
-            </button>
+    <!-- Modal Novo/Editar Produto -->
+    <div id="produtoModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">
+                        <i class="fas fa-box text-purple-600 mr-2"></i>
+                        <span id="modalTitle">Novo Produto</span>
+                    </h2>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <form id="produtoForm" onsubmit="saveProduto(event)">
+                    <div class="space-y-4">
+                        <!-- Nome -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Nome *
+                            </label>
+                            <input 
+                                type="text" 
+                                id="nome"
+                                required
+                                placeholder="Ex: Caneca Personalizada"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                            >
+                        </div>
+
+                        <!-- Referência e Categoria -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Referência *
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="referencia"
+                                    required
+                                    placeholder="Ex: CAN-001"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                >
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Categoria *
+                                </label>
+                                <select id="categoria" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                    <option value="Têxtil">Têxtil</option>
+                                    <option value="Brindes">Brindes</option>
+                                    <option value="Papelaria">Papelaria</option>
+                                    <option value="Outros">Outros</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Preços -->
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Preço Custo (€)
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="preco_custo"
+                                    placeholder="0,00"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                >
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Preço B2C *
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="preco_base_b2c"
+                                    required
+                                    placeholder="0,00"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                >
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Preço B2B *
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="preco_base_b2b"
+                                    required
+                                    placeholder="0,00"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Stock -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Stock *
+                            </label>
+                            <input 
+                                type="number" 
+                                id="stock"
+                                min="0"
+                                required
+                                placeholder="0"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                            >
+                        </div>
+
+                        <!-- Descrição -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Descrição
+                            </label>
+                            <textarea 
+                                id="descricao"
+                                rows="3"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                placeholder="Descrição do produto..."
+                            ></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="flex gap-3 mt-6">
+                        <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-semibold">
+                            <i class="fas fa-save mr-2"></i>Guardar
+                        </button>
+                        <button type="button" onclick="closeModal()" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-
-        <form id="produtoForm" class="p-6 space-y-4">
-            <div class="grid md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">
-                        <i class="fas fa-tag mr-1"></i>Nome *
-                    </label>
-                    <input type="text" id="nome" required 
-                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                        placeholder="Nome do produto">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">
-                        <i class="fas fa-barcode mr-1"></i>Referência *
-                    </label>
-                    <input type="text" id="referencia" required 
-                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                        placeholder="REF-001">
-                </div>
-            </div>
-
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-2">
-                    <i class="fas fa-list mr-1"></i>Categoria *
-                </label>
-                <select id="categoria" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500">
-                    <option value="">Selecione...</option>
-                    <option value="Têxtil">Têxtil</option>
-                    <option value="Brindes">Brindes</option>
-                    <option value="Papelaria">Papelaria</option>
-                    <option value="Outros">Outros</option>
-                </select>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">
-                        <i class="fas fa-euro-sign mr-1"></i>Preço B2C *
-                    </label>
-                    <input type="number" id="preco_b2c" required step="0.01" min="0"
-                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                        placeholder="0.00">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">
-                        <i class="fas fa-euro-sign mr-1"></i>Preço B2B *
-                    </label>
-                    <input type="number" id="preco_b2b" required step="0.01" min="0"
-                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                        placeholder="0.00">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">
-                        <i class="fas fa-boxes mr-1"></i>Stock *
-                    </label>
-                    <input type="number" id="stock" required min="0"
-                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                        placeholder="0">
-                </div>
-            </div>
-
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-2">
-                    <i class="fas fa-align-left mr-1"></i>Descrição
-                </label>
-                <textarea id="descricao" rows="3"
-                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Descrição do produto..."></textarea>
-            </div>
-
-            <div class="flex gap-3 pt-4">
-                <button type="submit" class="flex-1 bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700">
-                    <i class="fas fa-save mr-2"></i>Guardar
-                </button>
-                <button type="button" onclick="closeModal()" 
-                    class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-400">
-                    <i class="fas fa-times mr-2"></i>Cancelar
-                </button>
-            </div>
-        </form>
     </div>
-</div>
 
-<script>
-// Auth check
-const session = localStorage.getItem('encomendas_session');
-if (!session) window.location.href = 'login.html';
-else {
-    const sessionData = JSON.parse(session);
-    document.getElementById('userName').textContent = sessionData.name || sessionData.email;
-}
+    <script>
+        // Verificar autenticação
+        const session = localStorage.getItem('encomendas_session') || sessionStorage.getItem('encomendas_session');
+        if (!session) {
+            window.location.href = 'login.html';
+        }
 
-function handleLogout() {
-    if (confirm('Tem certeza que deseja sair?')) {
-        localStorage.removeItem('encomendas_session');
-        window.location.href = 'login.html';
-    }
-}
+        let allProdutos = [];
+        let editingProduto = null;
 
-// Produtos management
-let produtos = JSON.parse(localStorage.getItem('produtos') || '[]');
-let editingId = null;
+        // Logout
+        function logout() {
+            localStorage.removeItem('encomendas_session');
+            sessionStorage.removeItem('encomendas_session');
+            window.location.href = 'login.html';
+        }
 
-function renderProdutos() {
-    const grid = document.getElementById('produtosGrid');
-    const emptyState = document.getElementById('emptyState');
-    
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const filterCategoria = document.getElementById('filterCategoria').value;
-    
-    let filtered = produtos.filter(p => {
-        const matchSearch = p.nome.toLowerCase().includes(searchTerm) || 
-                          p.referencia.toLowerCase().includes(searchTerm);
-        const matchCategoria = !filterCategoria || p.categoria === filterCategoria;
-        return matchSearch && matchCategoria;
-    });
+        // Carregar dados iniciais
+        window.addEventListener('DOMContentLoaded', () => {
+            loadProdutos();
+        });
 
-    if (filtered.length === 0) {
-        grid.classList.add('hidden');
-        emptyState.classList.remove('hidden');
-        return;
-    }
+        // Carregar produtos
+        function loadProdutos() {
+            allProdutos = JSON.parse(localStorage.getItem('produtos') || '[]');
+            renderProdutos();
+        }
 
-    grid.classList.remove('hidden');
-    emptyState.classList.add('hidden');
-
-    const getCategoriaColor = (cat) => {
-        const colors = {
-            'Têxtil': 'bg-blue-100 text-blue-800',
-            'Brindes': 'bg-green-100 text-green-800',
-            'Papelaria': 'bg-yellow-100 text-yellow-800',
-            'Outros': 'bg-gray-100 text-gray-800'
-        };
-        return colors[cat] || 'bg-gray-100 text-gray-800';
-    };
-
-    grid.innerHTML = filtered.map(p => `
-        <div class="bg-white rounded-lg shadow hover:shadow-lg transition p-6">
-            <div class="flex justify-between items-start mb-4">
-                <span class="px-3 py-1 text-xs font-semibold rounded-full ${getCategoriaColor(p.categoria)}">
-                    ${p.categoria}
-                </span>
-                <div class="flex gap-2">
-                    <button onclick="editProduto('${p.id}')" class="text-blue-600 hover:text-blue-800">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button onclick="deleteProduto('${p.id}', '${p.nome}')" class="text-red-600 hover:text-red-800">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </div>
+        // Renderizar produtos
+        function renderProdutos() {
+            const list = document.getElementById('produtosList');
+            const emptyState = document.getElementById('emptyState');
             
-            <h3 class="text-lg font-bold text-gray-800 mb-2">${p.nome}</h3>
-            <p class="text-sm text-gray-600 mb-3">Ref: ${p.referencia}</p>
+            const filtered = filterProdutosList();
+
+            if (filtered.length === 0) {
+                list.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            list.innerHTML = filtered.map(produto => {
+                const categoriaColors = {
+                    'Têxtil': 'bg-blue-100 text-blue-800',
+                    'Brindes': 'bg-green-100 text-green-800',
+                    'Papelaria': 'bg-yellow-100 text-yellow-800',
+                    'Outros': 'bg-gray-100 text-gray-800'
+                };
+
+                return `
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold ${categoriaColors[produto.categoria] || 'bg-gray-100 text-gray-800'}">
+                                ${produto.categoria}
+                            </span>
+                            <div class="flex gap-2">
+                                <button onclick="editProduto(${produto.id})" class="p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="deleteProduto(${produto.id})" class="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">${produto.nome}</h3>
+                        <p class="text-sm text-gray-600 mb-4">Ref: ${produto.referencia}</p>
+
+                        <div class="grid grid-cols-2 gap-3 mb-4 text-sm">
+                            <div>
+                                <p class="text-gray-500">Preço B2C</p>
+                                <p class="font-semibold text-blue-600">€${parseFloat(produto.preco_base_b2c).toFixed(2)}</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">Preço B2B</p>
+                                <p class="font-semibold text-green-600">€${parseFloat(produto.preco_base_b2b).toFixed(2)}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                            <span class="text-sm text-gray-600">
+                                <i class="fas fa-box mr-1"></i>
+                                Stock: ${produto.stock}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Filtrar produtos
+        function filterProdutosList() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const categoriaFilter = document.getElementById('filterCategoria').value;
+
+            return allProdutos.filter(produto => {
+                const matchSearch = !searchTerm || 
+                    produto.nome.toLowerCase().includes(searchTerm) ||
+                    produto.referencia.toLowerCase().includes(searchTerm);
+                
+                const matchCategoria = !categoriaFilter || produto.categoria === categoriaFilter;
+
+                return matchSearch && matchCategoria;
+            });
+        }
+
+        function filterProdutos() {
+            renderProdutos();
+        }
+
+        // Abrir modal
+        function openModal() {
+            editingProduto = null;
+            document.getElementById('modalTitle').textContent = 'Novo Produto';
+            document.getElementById('produtoForm').reset();
+            document.getElementById('produtoModal').classList.remove('hidden');
+        }
+
+        // Fechar modal
+        function closeModal() {
+            document.getElementById('produtoModal').classList.add('hidden');
+        }
+
+        // Editar produto
+        function editProduto(id) {
+            editingProduto = allProdutos.find(p => p.id === id);
+            if (!editingProduto) return;
+
+            document.getElementById('modalTitle').textContent = 'Editar Produto';
+            document.getElementById('nome').value = editingProduto.nome;
+            document.getElementById('referencia').value = editingProduto.referencia;
+            document.getElementById('categoria').value = editingProduto.categoria;
+            document.getElementById('preco_custo').value = editingProduto.preco_custo || '';
+            document.getElementById('preco_base_b2c').value = editingProduto.preco_base_b2c;
+            document.getElementById('preco_base_b2b').value = editingProduto.preco_base_b2b;
+            document.getElementById('stock').value = editingProduto.stock;
+            document.getElementById('descricao').value = editingProduto.descricao || '';
             
-            <div class="space-y-2 mb-4">
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-600">Preço B2C:</span>
-                    <span class="font-semibold text-gray-800">${parseFloat(p.preco_b2c).toFixed(2)}€</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-600">Preço B2B:</span>
-                    <span class="font-semibold text-gray-800">${parseFloat(p.preco_b2b).toFixed(2)}€</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-600">Stock:</span>
-                    <span class="font-semibold ${p.stock > 0 ? 'text-green-600' : 'text-red-600'}">
-                        ${p.stock} un.
-                    </span>
-                </div>
-            </div>
+            document.getElementById('produtoModal').classList.remove('hidden');
+        }
+
+        // Guardar produto
+        function saveProduto(e) {
+            e.preventDefault();
+
+            const produtoData = {
+                id: editingProduto ? editingProduto.id : Date.now(),
+                nome: document.getElementById('nome').value,
+                referencia: document.getElementById('referencia').value,
+                categoria: document.getElementById('categoria').value,
+                preco_custo: parseFloat(document.getElementById('preco_custo').value.replace(',', '.')) || 0,
+                preco_base_b2c: parseFloat(document.getElementById('preco_base_b2c').value.replace(',', '.')) || 0,
+                preco_base_b2b: parseFloat(document.getElementById('preco_base_b2b').value.replace(',', '.')) || 0,
+                stock: parseInt(document.getElementById('stock').value) || 0,
+                descricao: document.getElementById('descricao').value,
+                created_at: editingProduto ? editingProduto.created_at : new Date().toISOString()
+            };
+
+            if (editingProduto) {
+                const index = allProdutos.findIndex(p => p.id === editingProduto.id);
+                allProdutos[index] = produtoData;
+            } else {
+                allProdutos.push(produtoData);
+            }
+
+            localStorage.setItem('produtos', JSON.stringify(allProdutos));
+            closeModal();
+            loadProdutos();
             
-            ${p.descricao ? `<p class="text-sm text-gray-600 border-t pt-3">${p.descricao}</p>` : ''}
-        </div>
-    `).join('');
-}
+            alert('✅ Produto guardado com sucesso!');
+        }
 
-function openModal() {
-    editingId = null;
-    document.getElementById('modalTitle').textContent = 'Novo Produto';
-    document.getElementById('produtoForm').reset();
-    document.getElementById('produtoModal').classList.remove('hidden');
-}
+        // Eliminar produto
+        function deleteProduto(id) {
+            if (!confirm('Tem certeza que deseja eliminar este produto?')) return;
 
-function closeModal() {
-    document.getElementById('produtoModal').classList.add('hidden');
-}
-
-function editProduto(id) {
-    const produto = produtos.find(p => p.id === id);
-    if (!produto) return;
-
-    editingId = id;
-    document.getElementById('modalTitle').textContent = 'Editar Produto';
-    document.getElementById('nome').value = produto.nome;
-    document.getElementById('referencia').value = produto.referencia;
-    document.getElementById('categoria').value = produto.categoria;
-    document.getElementById('preco_b2c').value = produto.preco_b2c;
-    document.getElementById('preco_b2b').value = produto.preco_b2b;
-    document.getElementById('stock').value = produto.stock;
-    document.getElementById('descricao').value = produto.descricao || '';
-    document.getElementById('produtoModal').classList.remove('hidden');
-}
-
-function deleteProduto(id, nome) {
-    if (confirm(`Tem certeza que deseja eliminar o produto "${nome}"?`)) {
-        produtos = produtos.filter(p => p.id !== id);
-        localStorage.setItem('produtos', JSON.stringify(produtos));
-        renderProdutos();
-    }
-}
-
-document.getElementById('produtoForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    const produtoData = {
-        id: editingId || Date.now().toString(),
-        nome: document.getElementById('nome').value,
-        referencia: document.getElementById('referencia').value,
-        categoria: document.getElementById('categoria').value,
-        preco_b2c: parseFloat(document.getElementById('preco_b2c').value),
-        preco_b2b: parseFloat(document.getElementById('preco_b2b').value),
-        stock: parseInt(document.getElementById('stock').value),
-        descricao: document.getElementById('descricao').value,
-        createdAt: editingId ? produtos.find(p => p.id === editingId).createdAt : Date.now()
-    };
-
-    if (editingId) {
-        produtos = produtos.map(p => p.id === editingId ? produtoData : p);
-    } else {
-        produtos.push(produtoData);
-    }
-
-    localStorage.setItem('produtos', JSON.stringify(produtos));
-    closeModal();
-    renderProdutos();
-});
-
-document.getElementById('searchInput').addEventListener('input', renderProdutos);
-document.getElementById('filterCategoria').addEventListener('change', renderProdutos);
-
-window.onload = renderProdutos;
-</script>
-
+            allProdutos = allProdutos.filter(p => p.id !== id);
+            localStorage.setItem('produtos', JSON.stringify(allProdutos));
+            loadProdutos();
+            
+            alert('✅ Produto eliminado com sucesso!');
+        }
+    </script>
 </body>
 </html>
