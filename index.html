@@ -1,7 +1,351 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-...
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistema de Gestão</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-900">
+                    <i class="fas fa-chart-line text-blue-600 mr-2"></i>
+                    Dashboard
+                </h1>
+                <button onclick="logout()" class="text-red-600 hover:text-red-700">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Stats Cards -->
+        <div class="grid md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Total Clientes</p>
+                        <p id="stat-clientes" class="text-3xl font-bold text-gray-900">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-users text-2xl text-blue-600"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Encomendas Ativas</p>
+                        <p id="stat-encomendas" class="text-3xl font-bold text-gray-900">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-box text-2xl text-green-600"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Orçamentos Pendentes</p>
+                        <p id="stat-orcamentos" class="text-3xl font-bold text-gray-900">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-file-invoice text-2xl text-yellow-600"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Faturação do Mês</p>
+                        <p id="stat-faturacao" class="text-3xl font-bold text-gray-900">€0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-euro-sign text-2xl text-purple-600"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="mb-8">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">
+                <i class="fas fa-bolt text-yellow-500 mr-2"></i>
+                Acesso Rápido
+            </h2>
+            <div class="grid md:grid-cols-3 gap-4">
+                <!-- Clientes -->
+                <a href="clientes.html" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-users text-2xl text-blue-600"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Clientes</h3>
+                    <p class="text-gray-600 text-sm">Gestão de clientes B2B e B2C</p>
+                </a>
+
+                <!-- Produtos -->
+                <a href="produtos.html" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-box text-2xl text-purple-600"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Produtos</h3>
+                    <p class="text-gray-600 text-sm">Catálogo e gestão de produtos</p>
+                </a>
+
+                <!-- Orçamentos -->
+                <a href="orcamentos.html" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-file-invoice text-2xl text-yellow-600"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Orçamentos</h3>
+                    <p class="text-gray-600 text-sm">Criar e gerir orçamentos</p>
+                </a>
+
+                <!-- Encomendas -->
+                <a href="encomendas.html" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-box text-2xl text-blue-600"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Encomendas</h3>
+                    <p class="text-gray-600 text-sm">Gestão completa de pedidos</p>
+                </a>
+
+                <!-- Pagamentos -->
+                <a href="pagamentos.html" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-euro-sign text-2xl text-green-600"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Pagamentos</h3>
+                    <p class="text-gray-600 text-sm">Controle de recebimentos</p>
+                </a>
+
+                <!-- Relatórios -->
+                <a href="relatorios.html" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-chart-bar text-2xl text-purple-600"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Relatórios</h3>
+                    <p class="text-gray-600 text-sm">Análise financeira completa</p>
+                </a>
+
+                <!-- PDV -->
+                <a href="pdv.html" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-cash-register text-2xl text-green-600"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">PDV</h3>
+                    <p class="text-gray-600 text-sm">Ponto de venda rápido</p>
+                </a>
+
+                <!-- Despesas -->
+                <a href="despesas.html" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-file-invoice-dollar text-2xl text-red-600"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Despesas</h3>
+                    <p class="text-gray-600 text-sm">Controle de gastos</p>
+                </a>
+
+                <!-- Tabela de Preços -->
+                <a href="tabela-precos.html" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-tags text-2xl text-indigo-600"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Tabela de Preços</h3>
+                    <p class="text-gray-600 text-sm">Preços B2B com descontos</p>
+                </a>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Encomendas por Estado</h3>
+                <div style="height: 300px;">
+                    <canvas id="encomendasChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Vendas dos Últimos 6 Meses</h3>
+                <div style="height: 300px;">
+                    <canvas id="vendasChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Verificar autenticação
+        const session = localStorage.getItem('encomendas_session') || sessionStorage.getItem('encomendas_session');
+        if (!session) {
+            window.location.href = 'login.html';
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('encomendas_session');
+            sessionStorage.removeItem('encomendas_session');
+            window.location.href = 'login.html';
+        }
+
+        // Carregar estatísticas
+        function loadStats() {
+            const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
+            const encomendas = JSON.parse(localStorage.getItem('encomendas') || '[]');
+            const orcamentos = JSON.parse(localStorage.getItem('orcamentos') || '[]');
+
+            document.getElementById('stat-clientes').textContent = clientes.length;
+
+            const encomendasAtivas = encomendas.filter(e => e.estado !== 'Entregue' && e.estado !== 'Cancelada');
+            document.getElementById('stat-encomendas').textContent = encomendasAtivas.length;
+
+            const orcamentosPendentes = orcamentos.filter(o => o.estado === 'Pendente');
+            document.getElementById('stat-orcamentos').textContent = orcamentosPendentes.length;
+
+            const hoje = new Date();
+            const primeiroDiaMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+            const encomendasMes = encomendas.filter(e => {
+                const dataEncomenda = new Date(e.created_at);
+                return dataEncomenda >= primeiroDiaMes && e.estado !== 'Cancelada';
+            });
+            const faturacaoMes = encomendasMes.reduce((sum, e) => sum + (e.quantidade * e.valor_unitario), 0);
+            document.getElementById('stat-faturacao').textContent = `€${faturacaoMes.toFixed(0)}`;
+        }
+
+        // Inicializar gráficos
+        function initCharts() {
+            const encomendas = JSON.parse(localStorage.getItem('encomendas') || '[]');
+
+            // Gráfico de Encomendas por Estado
+            const estadosCount = {};
+            encomendas.forEach(e => {
+                estadosCount[e.estado] = (estadosCount[e.estado] || 0) + 1;
+            });
+
+            const ctxEncomendas = document.getElementById('encomendasChart').getContext('2d');
+            new Chart(ctxEncomendas, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(estadosCount),
+                    datasets: [{
+                        data: Object.values(estadosCount),
+                        backgroundColor: [
+                            'rgb(234, 179, 8)',
+                            'rgb(59, 130, 246)',
+                            'rgb(168, 85, 247)',
+                            'rgb(34, 197, 94)',
+                            'rgb(239, 68, 68)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de Vendas Mensais
+            const vendasMensais = calcularVendasMensais(encomendas);
+            
+            const ctxVendas = document.getElementById('vendasChart').getContext('2d');
+            new Chart(ctxVendas, {
+                type: 'line',
+                data: {
+                    labels: vendasMensais.labels,
+                    datasets: [{
+                        label: 'Vendas',
+                        data: vendasMensais.values,
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => '€' + value
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function calcularVendasMensais(encomendas) {
+            const meses = [];
+            const hoje = new Date();
+            
+            for (let i = 5; i >= 0; i--) {
+                const data = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+                meses.push({
+                    label: data.toLocaleDateString('pt-PT', { month: 'short' }),
+                    mes: data.getMonth(),
+                    ano: data.getFullYear(),
+                    total: 0
+                });
+            }
+
+            encomendas.forEach(e => {
+                if (e.estado === 'Cancelada') return;
+                const data = new Date(e.created_at);
+                const mes = meses.find(m => m.mes === data.getMonth() && m.ano === data.getFullYear());
+                if (mes) {
+                    mes.total += (e.quantidade * e.valor_unitario);
+                }
+            });
+
+            return {
+                labels: meses.map(m => m.label),
+                values: meses.map(m => m.total)
+            };
+        }
+
+        // Carregar dados ao iniciar
+        window.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+            initCharts();
         });
     </script>
 </body>
