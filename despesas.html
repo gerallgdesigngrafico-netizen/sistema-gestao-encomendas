@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Despesas - Sistema de Gestão</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="text-gray-600 hover:text-gray-900">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <h1 class="text-2xl font-bold text-gray-900">
+                        <i class="fas fa-file-invoice-dollar text-red-600 mr-2"></i>
+                        Gestão de Despesas
+                    </h1>
+                </div>
+                <button onclick="logout()" class="text-red-600 hover:text-red-700">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Stats Cards -->
+        <div class="grid md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Total do Mês</p>
+                        <p id="totalMes" class="text-2xl font-bold text-red-600">€0.00</p>
+                    </div>
+                    <i class="fas fa-calendar-alt text-3xl text-red-600"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Total do Ano</p>
+                        <p id="totalAno" class="text-2xl font-bold text-orange-600">€0.00</p>
+                    </div>
+                    <i class="fas fa-chart-line text-3xl text-orange-600"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Despesas Pagas</p>
+                        <p id="totalPagas" class="text-2xl font-bold text-green-600">€0.00</p>
+                    </div>
+                    <i class="fas fa-check-circle text-3xl text-green-600"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Despesas Pendentes</p>
+                        <p id="totalPendentes" class="text-2xl font-bold text-yellow-600">€0.00</p>
+                    </div>
+                    <i class="fas fa-clock text-3xl text-yellow-600"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions Bar -->
+        <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div class="flex-1 max-w-md">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        id="searchInput"
+                        placeholder="Pesquisar despesas..."
+                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        oninput="filterDespesas()"
+                    >
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <select id="filterCategoria" onchange="filterDespesas()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
+                    <option value="">Todas as Categorias</option>
+                    <option value="Fornecedores">Fornecedores</option>
+                    <option value="Salários">Salários</option>
+                    <option value="Renda">Renda</option>
+                    <option value="Utilities">Utilities</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Equipamentos">Equipamentos</option>
+                    <option value="Outros">Outros</option>
+                </select>
+                <select id="filterEstado" onchange="filterDespesas()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
+                    <option value="">Todos os Estados</option>
+                    <option value="Paga">Paga</option>
+                    <option value="Pendente">Pendente</option>
+                </select>
+                <button onclick="openModal()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg flex items-center gap-2">
+                    <i class="fas fa-plus"></i>
+                    Nova Despesa
+                </button>
+            </div>
+        </div>
+
+        <!-- Despesas List -->
+        <div id="despesasList" class="space-y-4">
+            <!-- Despesas serão renderizadas aqui -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-16">
+            <i class="fas fa-file-invoice-dollar text-gray-400 text-6xl mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">Nenhuma despesa encontrada</h3>
+            <p class="text-gray-600 mb-6">Comece registrando a sua primeira despesa</p>
+            <button onclick="openModal()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg">
+                <i class="fas fa-plus mr-2"></i>Nova Despesa
+            </button>
+        </div>
+    </main>
+
+    <!-- Modal Nova/Editar Despesa -->
+    <div id="despesaModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">
+                        <i class="fas fa-file-invoice-dollar text-red-600 mr-2"></i>
+                        <span id="modalTitle">Nova Despesa</span>
+                    </h2>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <form id="despesaForm" onsubmit="saveDespesa(event)">
+                    <div class="space-y-4">
+                        <!-- Descrição -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Descrição *
+                            </label>
+                            <input 
+                                type="text" 
+                                id="descricao"
+                                required
+                                placeholder="Ex: Pagamento de fornecedor, Renda do escritório..."
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"
+                            >
+                        </div>
+
+                        <!-- Categoria e Valor -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Categoria *
+                                </label>
+                                <select id="categoria" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
+                                    <option value="Fornecedores">Fornecedores</option>
+                                    <option value="Salários">Salários</option>
+                                    <option value="Renda">Renda</option>
+                                    <option value="Utilities">Utilities (Água, Luz, Internet)</option>
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="Equipamentos">Equipamentos</option>
+                                    <option value="Outros">Outros</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Valor (€) *
+                                </label>
+                                <input 
+                                    type="number" 
+                                    id="valor"
+                                    step="0.01"
+                                    min="0.01"
+                                    required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Data e Estado -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Data da Despesa *
+                                </label>
+                                <input 
+                                    type="date" 
+                                    id="data_despesa"
+                                    required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"
+                                >
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Estado *
+                                </label>
+                                <select id="estado" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
+                                    <option value="Paga">Paga</option>
+                                    <option value="Pendente">Pendente</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Fornecedor e Referência -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Fornecedor/Beneficiário
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="fornecedor"
+                                    placeholder="Nome do fornecedor..."
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"
+                                >
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Nº Fatura/Referência
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="referencia"
+                                    placeholder="Nº da fatura..."
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Observações -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Observações
+                            </label>
+                            <textarea 
+                                id="observacoes"
+                                rows="3"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"
+                                placeholder="Observações adicionais..."
+                            ></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="flex gap-3 mt-6">
+                        <button type="submit" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-semibold">
+                            <i class="fas fa-save mr-2"></i>Guardar
+                        </button>
+                        <button type="button" onclick="closeModal()" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Verificar autenticação
+        const session = localStorage.getItem('encomendas_session') || sessionStorage.getItem('encomendas_session');
+        if (!session) {
+            window.location.href = 'login.html';
+        }
+
+        let allDespesas = [];
+        let editingDespesa = null;
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('encomendas_session');
+            sessionStorage.removeItem('encomendas_session');
+            window.location.href = 'login.html';
+        }
+
+        // Carregar dados iniciais
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('data_despesa').valueAsDate = new Date();
+            loadDespesas();
+        });
+
+        // Carregar despesas
+        function loadDespesas() {
+            allDespesas = JSON.parse(localStorage.getItem('despesas') || '[]');
+            updateStats();
+            renderDespesas();
+        }
+
+        // Atualizar estatísticas
+        function updateStats() {
+            const hoje = new Date();
+            const primeiroDiaMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+            const primeiroDiaAno = new Date(hoje.getFullYear(), 0, 1);
+
+            const despesasMes = allDespesas.filter(d => new Date(d.data_despesa) >= primeiroDiaMes);
+            const despesasAno = allDespesas.filter(d => new Date(d.data_despesa) >= primeiroDiaAno);
+            const despesasPagas = allDespesas.filter(d => d.estado === 'Paga');
+            const despesasPendentes = allDespesas.filter(d => d.estado === 'Pendente');
+
+            const totalMes = despesasMes.reduce((sum, d) => sum + parseFloat(d.valor), 0);
+            const totalAno = despesasAno.reduce((sum, d) => sum + parseFloat(d.valor), 0);
+            const totalPagas = despesasPagas.reduce((sum, d) => sum + parseFloat(d.valor), 0);
+            const totalPendentes = despesasPendentes.reduce((sum, d) => sum + parseFloat(d.valor), 0);
+
+            document.getElementById('totalMes').textContent = `€${totalMes.toFixed(2)}`;
+            document.getElementById('totalAno').textContent = `€${totalAno.toFixed(2)}`;
+            document.getElementById('totalPagas').textContent = `€${totalPagas.toFixed(2)}`;
+            document.getElementById('totalPendentes').textContent = `€${totalPendentes.toFixed(2)}`;
+        }
+
+        // Renderizar despesas
+        function renderDespesas() {
+            const list = document.getElementById('despesasList');
+            const emptyState = document.getElementById('emptyState');
+            
+            const filtered = filterDespesasList();
+
+            if (filtered.length === 0) {
+                list.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            const categoriasIcons = {
+                'Fornecedores': 'fa-truck',
+                'Salários': 'fa-users',
+                'Renda': 'fa-building',
+                'Utilities': 'fa-plug',
+                'Marketing': 'fa-bullhorn',
+                'Equipamentos': 'fa-tools',
+                'Outros': 'fa-file-invoice'
+            };
+
+            const estadoCores = {
+                'Paga': 'bg-green-100 text-green-800',
+                'Pendente': 'bg-yellow-100 text-yellow-800'
+            };
+
+            list.innerHTML = filtered.map(despesa => `
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas ${categoriasIcons[despesa.categoria] || 'fa-file-invoice'} text-xl text-red-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900">${despesa.descricao}</h3>
+                                    <p class="text-sm text-gray-600">${despesa.categoria}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-4 gap-4 mt-4 text-sm">
+                                <div>
+                                    <p class="text-gray-500">Valor</p>
+                                    <p class="font-semibold text-red-600 text-lg">€${parseFloat(despesa.valor).toFixed(2)}</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Data</p>
+                                    <p class="font-semibold">${new Date(despesa.data_despesa).toLocaleDateString('pt-PT')}</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Estado</p>
+                                    <span class="inline-block px-2 py-1 rounded-full text-xs font-semibold ${estadoCores[despesa.estado]}">${despesa.estado}</span>
+                                </div>
+                                ${despesa.fornecedor ? `
+                                    <div>
+                                        <p class="text-gray-500">Fornecedor</p>
+                                        <p class="font-semibold">${despesa.fornecedor}</p>
+                                    </div>
+                                ` : '<div></div>'}
+                            </div>
+
+                            ${despesa.referencia ? `
+                                <div class="mt-3 text-sm">
+                                    <p class="text-gray-500">Referência: <span class="font-semibold">${despesa.referencia}</span></p>
+                                </div>
+                            ` : ''}
+
+                            ${despesa.observacoes ? `
+                                <div class="mt-3 text-sm">
+                                    <p class="text-gray-500">Observações</p>
+                                    <p class="text-gray-700">${despesa.observacoes}</p>
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="flex gap-2 ml-4">
+                            <button onclick="editDespesa(${despesa.id})" class="p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteDespesa(${despesa.id})" class="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filtrar despesas
+        function filterDespesasList() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const categoriaFilter = document.getElementById('filterCategoria').value;
+            const estadoFilter = document.getElementById('filterEstado').value;
+
+            return allDespesas.filter(despesa => {
+                const matchSearch = !searchTerm || 
+                    despesa.descricao.toLowerCase().includes(searchTerm) ||
+                    (despesa.fornecedor && despesa.fornecedor.toLowerCase().includes(searchTerm));
+                
+                const matchCategoria = !categoriaFilter || despesa.categoria === categoriaFilter;
+                const matchEstado = !estadoFilter || despesa.estado === estadoFilter;
+
+                return matchSearch && matchCategoria && matchEstado;
+            });
+        }
+
+        function filterDespesas() {
+            renderDespesas();
+        }
+
+        // Abrir modal
+        function openModal() {
+            editingDespesa = null;
+            document.getElementById('modalTitle').textContent = 'Nova Despesa';
+            document.getElementById('despesaForm').reset();
+            document.getElementById('data_despesa').valueAsDate = new Date();
+            document.getElementById('despesaModal').classList.remove('hidden');
+        }
+
+        // Fechar modal
+        function closeModal() {
+            document.getElementById('despesaModal').classList.add('hidden');
+        }
+
+        // Editar despesa
+        function editDespesa(id) {
+            editingDespesa = allDespesas.find(d => d.id === id);
+            if (!editingDespesa) return;
+
+            document.getElementById('modalTitle').textContent = 'Editar Despesa';
+            document.getElementById('descricao').value = editingDespesa.descricao;
+            document.getElementById('categoria').value = editingDespesa.categoria;
+            document.getElementById('valor').value = editingDespesa.valor;
+            document.getElementById('data_despesa').value = editingDespesa.data_despesa;
+            document.getElementById('estado').value = editingDespesa.estado;
+            document.getElementById('fornecedor').value = editingDespesa.fornecedor || '';
+            document.getElementById('referencia').value = editingDespesa.referencia || '';
+            document.getElementById('observacoes').value = editingDespesa.observacoes || '';
+            
+            document.getElementById('despesaModal').classList.remove('hidden');
+        }
+
+        // Guardar despesa
+        function saveDespesa(e) {
+            e.preventDefault();
+
+            const despesaData = {
+                id: editingDespesa ? editingDespesa.id : Date.now(),
+                descricao: document.getElementById('descricao').value,
+                categoria: document.getElementById('categoria').value,
+                valor: parseFloat(document.getElementById('valor').value),
+                data_despesa: document.getElementById('data_despesa').value,
+                estado: document.getElementById('estado').value,
+                fornecedor: document.getElementById('fornecedor').value,
+                referencia: document.getElementById('referencia').value,
+                observacoes: document.getElementById('observacoes').value,
+                created_at: editingDespesa ? editingDespesa.created_at : new Date().toISOString()
+            };
+
+            if (editingDespesa) {
+                const index = allDespesas.findIndex(d => d.id === editingDespesa.id);
+                allDespesas[index] = despesaData;
+            } else {
+                allDespesas.push(despesaData);
+            }
+
+            localStorage.setItem('despesas', JSON.stringify(allDespesas));
+            closeModal();
+            loadDespesas();
+            
+            alert('✅ Despesa guardada com sucesso!');
+        }
+
+        // Eliminar despesa
+        function deleteDespesa(id) {
+            if (!confirm('Tem certeza que deseja eliminar esta despesa?')) return;
+
+            allDespesas = allDespesas.filter(d => d.id !== id);
+            localStorage.setItem('despesas', JSON.stringify(allDespesas));
+            loadDespesas();
+            
+            alert('✅ Despesa eliminada com sucesso!');
+        }
+    </script>
+</body>
+</html>
